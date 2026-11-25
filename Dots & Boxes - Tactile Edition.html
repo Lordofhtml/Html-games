@@ -1,0 +1,1777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dots & Boxes</title>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --border-subtle: rgba(148, 163, 184, 0.2);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --p1-color: #38bdf8;
+            --p1-glow: rgba(56, 189, 248, 0.35);
+            --p1-fill: rgba(56, 189, 248, 0.22);
+            --p2-color: #fb7185;
+            --p2-glow: rgba(251, 113, 133, 0.35);
+            --p2-fill: rgba(251, 113, 133, 0.22);
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --radius-lg: 20px;
+            --radius-md: 14px;
+            --radius-sm: 10px;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            background-image: radial-gradient(rgba(148, 163, 184, 0.14) 1px, transparent 1px);
+            background-size: 22px 22px;
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .app-header {
+            width: 100%;
+            max-width: 820px;
+            padding: 16px 20px 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 10;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--p1-color), var(--p2-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .brand-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.15s ease, transform 0.1s ease;
+        }
+
+        .icon-btn:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .icon-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* Main Container */
+        .main-container {
+            width: 100%;
+            max-width: 820px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 16px 28px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Card Panel */
+        .panel {
+            background: rgba(30, 41, 59, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Home Setup Screen */
+        .home-card {
+            width: 100%;
+            max-width: 520px;
+            padding: 28px 24px;
+            animation: fadeIn 0.25s ease-out;
+        }
+
+        .home-hero {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--p1-color);
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.28);
+            padding: 4px 10px;
+            border-radius: 999px;
+            margin-bottom: 8px;
+        }
+
+        .home-hero h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 4px;
+        }
+
+        .home-hero p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .section-label {
+            display: block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .setup-group {
+            margin-bottom: 20px;
+        }
+
+        /* Mode Buttons */
+        .mode-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .mode-btn {
+            background: rgba(15, 23, 42, 0.65);
+            border: 2px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 12px 14px;
+            text-align: left;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .mode-btn:hover {
+            border-color: rgba(148, 163, 184, 0.45);
+        }
+
+        .mode-btn.selected {
+            border-color: var(--p1-color);
+            background: rgba(56, 189, 248, 0.1);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+        }
+
+        .mode-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .mode-tag {
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        .tag-easy { background: rgba(16, 185, 129, 0.18); color: #34d399; }
+        .tag-normal { background: rgba(245, 158, 11, 0.18); color: #fbbf24; }
+        .tag-hard { background: rgba(244, 63, 94, 0.18); color: #fb7185; }
+        .tag-pvp { background: rgba(99, 102, 241, 0.22); color: #a5b4fc; }
+
+        .mode-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .mode-desc {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Size Grid */
+        .size-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        @media (min-width: 480px) {
+            .size-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .size-btn {
+            background: rgba(15, 23, 42, 0.65);
+            border: 2px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            padding: 10px 8px;
+            color: var(--text-primary);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.15s ease;
+        }
+
+        .size-btn:hover {
+            border-color: rgba(148, 163, 184, 0.45);
+        }
+
+        .size-btn.selected {
+            border-color: var(--accent);
+            background: rgba(99, 102, 241, 0.18);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
+        }
+
+        .size-main {
+            display: block;
+            font-size: 0.95rem;
+            font-weight: 800;
+        }
+
+        .size-sub {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        /* Player Name Inputs */
+        .players-box {
+            background: rgba(15, 23, 42, 0.55);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            margin-bottom: 22px;
+        }
+
+        .players-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .player-input-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            padding: 8px 10px;
+        }
+
+        .player-input-wrap:focus-within {
+            border-color: var(--p1-color);
+        }
+
+        .player-input-wrap.p2:focus-within {
+            border-color: var(--p2-color);
+        }
+
+        .dot-swatch {
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .player-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 0.88rem;
+            font-weight: 600;
+            outline: none;
+        }
+
+        .primary-btn {
+            width: 100%;
+            padding: 14px 20px;
+            border-radius: var(--radius-md);
+            border: none;
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            color: #ffffff;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.35);
+            transition: transform 0.12s ease, filter 0.15s ease;
+        }
+
+        .primary-btn:hover {
+            filter: brightness(1.07);
+        }
+
+        .primary-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Gameplay Screen */
+        .game-screen {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            animation: fadeIn 0.25s ease-out;
+        }
+
+        .scoreboard {
+            width: 100%;
+            max-width: 640px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .score-card {
+            padding: 12px 14px;
+            border-radius: var(--radius-md);
+            border: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            opacity: 0.72;
+            transition: all 0.2s ease;
+        }
+
+        .score-card.active-p1 {
+            opacity: 1;
+            border-color: var(--p1-color);
+            box-shadow: 0 0 18px var(--p1-glow);
+        }
+
+        .score-card.active-p2 {
+            opacity: 1;
+            border-color: var(--p2-color);
+            box-shadow: 0 0 18px var(--p2-glow);
+        }
+
+        .player-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .avatar-badge {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.9rem;
+            color: #0f172a;
+            flex-shrink: 0;
+        }
+
+        .avatar-p1 { background: var(--p1-color); }
+        .avatar-p2 { background: var(--p2-color); }
+
+        .player-details {
+            min-width: 0;
+        }
+
+        .player-name {
+            font-size: 0.92rem;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .player-turn-label {
+            font-size: 0.74rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .active-p1 .player-turn-label { color: var(--p1-color); }
+        .active-p2 .player-turn-label { color: var(--p2-color); }
+
+        .player-score {
+            font-size: 1.75rem;
+            font-weight: 800;
+            line-height: 1;
+            padding-left: 8px;
+        }
+
+        .score-p1 { color: var(--p1-color); }
+        .score-p2 { color: var(--p2-color); }
+
+        /* Status Bar */
+        .status-strip {
+            width: 100%;
+            max-width: 640px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .info-pill {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 5px 11px;
+            border-radius: 999px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+        }
+
+        .turn-pill {
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 5px 12px;
+            border-radius: 999px;
+            background: rgba(56, 189, 248, 0.14);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            color: var(--p1-color);
+        }
+
+        .turn-pill.p2 {
+            background: rgba(251, 113, 133, 0.14);
+            border-color: rgba(251, 113, 133, 0.35);
+            color: var(--p2-color);
+        }
+
+        /* Board Container */
+        .board-panel {
+            width: 100%;
+            max-width: 780px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #board-svg {
+            width: 100%;
+            height: auto;
+            max-height: 62vh;
+            display: block;
+            margin: 0 auto;
+            touch-action: manipulation;
+        }
+
+        /* SVG Edge & Box Styling */
+        .edge-hitbox {
+            cursor: pointer;
+            stroke: transparent;
+            stroke-linecap: round;
+            pointer-events: all;
+        }
+
+        .edge-visual {
+            stroke-linecap: round;
+            pointer-events: none;
+            transition: stroke 0.15s ease, opacity 0.15s ease;
+        }
+
+        .edge-group.interactive.p1-turn:hover .edge-visual.unclaimed {
+            stroke: var(--p1-color);
+            opacity: 0.65;
+        }
+
+        .edge-group.interactive.p2-turn:hover .edge-visual.unclaimed {
+            stroke: var(--p2-color);
+            opacity: 0.65;
+        }
+
+        @keyframes boxPop {
+            0% { transform: scale(0.4); opacity: 0; }
+            75% { transform: scale(1.06); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .box-claimed {
+            transform-box: fill-box;
+            transform-origin: center;
+            animation: boxPop 0.28s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        /* Bottom Action Buttons */
+        .bottom-controls {
+            width: 100%;
+            max-width: 460px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .secondary-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.15s ease, transform 0.1s ease;
+        }
+
+        .secondary-btn:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .secondary-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Modals */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.78);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            z-index: 50;
+        }
+
+        .modal-card {
+            width: 100%;
+            max-width: 420px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.55);
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .modal-header h2 {
+            font-size: 1.35rem;
+            font-weight: 800;
+        }
+
+        .close-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .rules-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            line-height: 1.45;
+            margin-bottom: 20px;
+        }
+
+        .rule-item {
+            display: flex;
+            gap: 10px;
+        }
+
+        .rule-num {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            background: rgba(56, 189, 248, 0.16);
+            color: var(--p1-color);
+            font-weight: 800;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .gameover-card {
+            text-align: center;
+        }
+
+        .winner-emoji {
+            font-size: 3rem;
+            margin-bottom: 8px;
+        }
+
+        .winner-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin: 6px 0 18px;
+        }
+
+        .final-scores {
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            margin-bottom: 18px;
+        }
+
+        .final-col-name {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .final-col-val {
+            font-size: 1.85rem;
+            font-weight: 800;
+            margin-top: 2px;
+        }
+
+        .divider-v {
+            width: 1px;
+            height: 36px;
+            background: var(--border-subtle);
+        }
+
+        .modal-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Header -->
+    <header class="app-header">
+        <div class="brand" id="brand-home-btn" title="Return to Home">
+            <div class="brand-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.6">
+                    <circle cx="6" cy="6" r="2.2" fill="#ffffff"/>
+                    <circle cx="18" cy="6" r="2.2" fill="#ffffff"/>
+                    <circle cx="6" cy="18" r="2.2" fill="#ffffff"/>
+                    <circle cx="18" cy="18" r="2.2" fill="#ffffff"/>
+                    <line x1="8.5" y1="6" x2="15.5" y2="6" stroke-linecap="round"/>
+                    <line x1="6" y1="8.5" x2="6" y2="15.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <span class="brand-title">Dots &amp; Boxes</span>
+        </div>
+
+        <div class="header-actions">
+            <button type="button" class="icon-btn" id="btn-open-rules">
+                <span>?</span>
+                <span>How to Play</span>
+            </button>
+            <button type="button" class="icon-btn" id="btn-toggle-sound" title="Toggle Sound">
+                <span id="sound-icon">🔊</span>
+                <span id="sound-label">Sound</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+
+        <!-- ==================== HOME SCREEN ==================== -->
+        <section id="screen-home" class="panel home-card">
+            <div class="home-hero">
+                <span class="hero-badge">Strategy Board Game</span>
+                <h1>Dots &amp; Boxes</h1>
+                <p>Connect adjacent dots, complete squares, and chain bonus turns.</p>
+            </div>
+
+            <!-- Mode Selection -->
+            <div class="setup-group">
+                <span class="section-label">1. Choose Game Mode</span>
+                <div class="mode-grid" id="mode-grid">
+                    <button type="button" class="mode-btn" data-mode="ai-easy">
+                        <div class="mode-top">
+                            <span>🤖</span>
+                            <span class="mode-tag tag-easy">Easy</span>
+                        </div>
+                        <span class="mode-title">vs AI Easy</span>
+                        <span class="mode-desc">Casual &amp; forgiving</span>
+                    </button>
+
+                    <button type="button" class="mode-btn selected" data-mode="ai-normal">
+                        <div class="mode-top">
+                            <span>🧠</span>
+                            <span class="mode-tag tag-normal">Normal</span>
+                        </div>
+                        <span class="mode-title">vs AI Normal</span>
+                        <span class="mode-desc">Balanced tactical play</span>
+                    </button>
+
+                    <button type="button" class="mode-btn" data-mode="ai-hard">
+                        <div class="mode-top">
+                            <span>⚡</span>
+                            <span class="mode-tag tag-hard">Hard</span>
+                        </div>
+                        <span class="mode-title">vs AI Hard</span>
+                        <span class="mode-desc">Chain-counting master</span>
+                    </button>
+
+                    <button type="button" class="mode-btn" data-mode="pvp">
+                        <div class="mode-top">
+                            <span>👥</span>
+                            <span class="mode-tag tag-pvp">2 Players</span>
+                        </div>
+                        <span class="mode-title">Friend vs Friend</span>
+                        <span class="mode-desc">Local pass &amp; play</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Board Size Selection -->
+            <div class="setup-group">
+                <span class="section-label">2. Board Size</span>
+                <div class="size-grid" id="size-grid">
+                    <button type="button" class="size-btn" data-cols="3" data-rows="3">
+                        <span class="size-main">3×3</span>
+                        <span class="size-sub">9 Boxes • Quick</span>
+                    </button>
+                    <button type="button" class="size-btn selected" data-cols="4" data-rows="4">
+                        <span class="size-main">4×4</span>
+                        <span class="size-sub">16 Boxes • Classic</span>
+                    </button>
+                    <button type="button" class="size-btn" data-cols="5" data-rows="5">
+                        <span class="size-main">5×5</span>
+                        <span class="size-sub">25 Boxes • Tactical</span>
+                    </button>
+                    <button type="button" class="size-btn" data-cols="10" data-rows="5">
+                        <span class="size-main">10×5</span>
+                        <span class="size-sub">50 Boxes • Epic</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Player Names -->
+            <div class="players-box">
+                <span class="section-label">3. Player Names</span>
+                <div class="players-row">
+                    <div class="player-input-wrap">
+                        <span class="dot-swatch" style="background: var(--p1-color);"></span>
+                        <input type="text" id="input-p1" class="player-input" maxlength="16" value="Player 1" placeholder="Player 1">
+                    </div>
+                    <div class="player-input-wrap p2">
+                        <span class="dot-swatch" style="background: var(--p2-color);"></span>
+                        <input type="text" id="input-p2" class="player-input" maxlength="16" value="AI Bot (Normal)" placeholder="Player 2">
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" class="primary-btn" id="btn-start-game">Start Game</button>
+        </section>
+
+        <!-- ==================== GAMEPLAY SCREEN ==================== -->
+        <section id="screen-game" class="game-screen hidden">
+            <!-- Scoreboard -->
+            <div class="scoreboard">
+                <div id="card-p1" class="panel score-card active-p1">
+                    <div class="player-meta">
+                        <div id="avatar-p1" class="avatar-badge avatar-p1">P1</div>
+                        <div class="player-details">
+                            <div id="label-p1-name" class="player-name">Player 1</div>
+                            <div id="label-p1-status" class="player-turn-label">Your Turn</div>
+                        </div>
+                    </div>
+                    <div id="label-p1-score" class="player-score score-p1">0</div>
+                </div>
+
+                <div id="card-p2" class="panel score-card">
+                    <div class="player-meta">
+                        <div id="avatar-p2" class="avatar-badge avatar-p2">AI</div>
+                        <div class="player-details">
+                            <div id="label-p2-name" class="player-name">AI Bot (Normal)</div>
+                            <div id="label-p2-status" class="player-turn-label">Waiting</div>
+                        </div>
+                    </div>
+                    <div id="label-p2-score" class="player-score score-p2">0</div>
+                </div>
+            </div>
+
+            <!-- Status Strip -->
+            <div class="status-strip">
+                <span id="badge-board-info" class="info-pill">4×4 • 16 Boxes Left</span>
+                <span id="badge-turn-info" class="turn-pill">Player 1's Turn</span>
+            </div>
+
+            <!-- SVG Board -->
+            <div class="panel board-panel">
+                <svg id="board-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+            </div>
+
+            <!-- Controls -->
+            <div class="bottom-controls">
+                <button type="button" class="secondary-btn" id="btn-home">← Main Menu</button>
+                <button type="button" class="secondary-btn" id="btn-restart">↻ Restart Board</button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==================== HOW TO PLAY MODAL ==================== -->
+    <div id="modal-rules" class="modal-backdrop hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>How to Play</h2>
+                <button type="button" class="close-btn" id="btn-close-rules">✕</button>
+            </div>
+            <div class="rules-list">
+                <div class="rule-item">
+                    <span class="rule-num">1</span>
+                    <p><strong>Connect Dots:</strong> Tap any dashed line between two adjacent dots to claim that edge.</p>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-num">2</span>
+                    <p><strong>Complete Boxes &amp; Bonus Turns:</strong> Drawing the 4th side of a 1×1 square captures the box for 1 point and gives you an immediate <strong>bonus turn</strong>.</p>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-num">3</span>
+                    <p><strong>Avoid 3-Sided Traps:</strong> Try not to draw the 3rd side of a box unless forced, or your opponent will capture it and chain adjacent boxes.</p>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-num">4</span>
+                    <p><strong>Win the Grid:</strong> Once all boxes are claimed, the player with the most boxes wins!</p>
+                </div>
+            </div>
+            <button type="button" class="primary-btn" id="btn-got-it">Got It</button>
+        </div>
+    </div>
+
+    <!-- ==================== GAME OVER MODAL ==================== -->
+    <div id="modal-gameover" class="modal-backdrop hidden">
+        <div class="modal-card gameover-card">
+            <div id="gameover-emoji" class="winner-emoji">🏆</div>
+            <h2 id="gameover-title">Player 1 Wins!</h2>
+            <p id="gameover-subtitle" class="winner-subtitle">Great territory control.</p>
+
+            <div class="final-scores">
+                <div>
+                    <div id="final-p1-name" class="final-col-name">Player 1</div>
+                    <div id="final-p1-score" class="final-col-val score-p1">0</div>
+                </div>
+                <div class="divider-v"></div>
+                <div>
+                    <div id="final-p2-name" class="final-col-name">Player 2</div>
+                    <div id="final-p2-score" class="final-col-val score-p2">0</div>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="primary-btn" id="btn-play-again">Play Again</button>
+                <button type="button" class="secondary-btn" id="btn-gameover-home">Main Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            "use strict";
+
+            /* =========================================================================
+               SOUND EFFECTS (Web Audio API with safe fallback)
+               ========================================================================= */
+            class SoundFX {
+                constructor() {
+                    this.ctx = null;
+                    this.muted = false;
+                }
+
+                ensureContext() {
+                    if (this.muted) return null;
+                    try {
+                        if (!this.ctx) {
+                            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                            if (AudioCtx) {
+                                this.ctx = new AudioCtx();
+                            }
+                        }
+                        if (this.ctx && this.ctx.state === "suspended") {
+                            this.ctx.resume();
+                        }
+                    } catch (e) {
+                        this.ctx = null;
+                    }
+                    return this.ctx;
+                }
+
+                toggleMute() {
+                    this.muted = !this.muted;
+                    const icon = document.getElementById("sound-icon");
+                    const label = document.getElementById("sound-label");
+                    if (icon) icon.textContent = this.muted ? "🔇" : "🔊";
+                    if (label) label.textContent = this.muted ? "Muted" : "Sound";
+                }
+
+                tone(freq, type, duration, gainVal, delay) {
+                    const ctx = this.ensureContext();
+                    if (!ctx) return;
+                    try {
+                        const now = ctx.currentTime + (delay || 0);
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = type || "sine";
+                        osc.frequency.setValueAtTime(freq, now);
+                        gain.gain.setValueAtTime(0.001, now);
+                        gain.gain.exponentialRampToValueAtTime(gainVal || 0.1, now + 0.015);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.start(now);
+                        osc.stop(now + duration + 0.02);
+                    } catch (e) {
+                        // Ignore audio failures in restricted environments
+                    }
+                }
+
+                playEdge(player) {
+                    const base = player === 1 ? 440 : 370;
+                    this.tone(base, "sine", 0.08, 0.1, 0);
+                }
+
+                playBox(combo) {
+                    const boost = Math.min(combo || 1, 6) * 40;
+                    this.tone(523.25 + boost, "sine", 0.15, 0.13, 0);
+                    this.tone(659.25 + boost, "triangle", 0.2, 0.12, 0.06);
+                }
+
+                playWin() {
+                    [523.25, 659.25, 783.99, 1046.5].forEach((f, idx) => {
+                        this.tone(f, "triangle", 0.25, 0.13, idx * 0.08);
+                    });
+                }
+
+                playLose() {
+                    [415.3, 369.99, 329.63, 277.18].forEach((f, idx) => {
+                        this.tone(f, "sine", 0.25, 0.11, idx * 0.1);
+                    });
+                }
+            }
+
+            /* =========================================================================
+               DOTS & BOXES ENGINE (Full Rectangular & Square Support)
+               ========================================================================= */
+            class DotsAndBoxesGame {
+                constructor() {
+                    this.sfx = new SoundFX();
+
+                    // Configuration defaults
+                    this.mode = "ai-normal"; // 'ai-easy' | 'ai-normal' | 'ai-hard' | 'pvp'
+                    this.cols = 4;           // Number of box columns (3, 4, 5, or 10)
+                    this.rows = 4;           // Number of box rows (3, 4, or 5)
+                    this.p1Name = "Player 1";
+                    this.p2Name = "AI Bot (Normal)";
+                    this.p2CustomEdited = false;
+
+                    // Runtime game state
+                    this.hLines = [];        // [rows + 1][cols] -> 0 | 1 | 2
+                    this.vLines = [];        // [rows][cols + 1] -> 0 | 1 | 2
+                    this.boxes = [];         // [rows][cols]     -> 0 | 1 | 2
+                    this.scores = { 1: 0, 2: 0 };
+                    this.currentPlayer = 1;
+                    this.gameOver = false;
+                    this.aiThinking = false;
+                    this.lastMove = null;
+                    this.combo = 0;
+
+                    // Turn token cancels stale AI timers on reset or home navigation
+                    this.sessionToken = 0;
+                    this.aiTimeoutId = null;
+
+                    this.bindEvents();
+                }
+
+                bindEvents() {
+                    // Mode buttons
+                    document.querySelectorAll("#mode-grid .mode-btn").forEach((btn) => {
+                        btn.addEventListener("click", () => {
+                            this.selectMode(btn.getAttribute("data-mode"));
+                        });
+                    });
+
+                    // Size buttons
+                    document.querySelectorAll("#size-grid .size-btn").forEach((btn) => {
+                        btn.addEventListener("click", () => {
+                            const c = parseInt(btn.getAttribute("data-cols"), 10);
+                            const r = parseInt(btn.getAttribute("data-rows"), 10);
+                            this.selectSize(c, r);
+                        });
+                    });
+
+                    // Player 2 input edit tracking
+                    const inputP2 = document.getElementById("input-p2");
+                    inputP2.addEventListener("input", () => {
+                        this.p2CustomEdited = true;
+                    });
+
+                    // Primary navigation buttons
+                    document.getElementById("btn-start-game").addEventListener("click", () => this.startNewMatch());
+                    document.getElementById("btn-restart").addEventListener("click", () => this.resetBoard());
+                    document.getElementById("btn-home").addEventListener("click", () => this.showHome());
+                    document.getElementById("brand-home-btn").addEventListener("click", () => this.showHome());
+
+                    // Modals & sound
+                    document.getElementById("btn-open-rules").addEventListener("click", () => this.setRulesVisible(true));
+                    document.getElementById("btn-close-rules").addEventListener("click", () => this.setRulesVisible(false));
+                    document.getElementById("btn-got-it").addEventListener("click", () => this.setRulesVisible(false));
+                    document.getElementById("btn-toggle-sound").addEventListener("click", () => this.sfx.toggleMute());
+
+                    // Game Over modal buttons
+                    document.getElementById("btn-play-again").addEventListener("click", () => this.resetBoard());
+                    document.getElementById("btn-gameover-home").addEventListener("click", () => this.showHome());
+                }
+
+                selectMode(newMode) {
+                    this.mode = newMode;
+                    document.querySelectorAll("#mode-grid .mode-btn").forEach((btn) => {
+                        btn.classList.toggle("selected", btn.getAttribute("data-mode") === newMode);
+                    });
+
+                    const inputP2 = document.getElementById("input-p2");
+                    if (!this.p2CustomEdited || !inputP2.value.trim()) {
+                        const defaultNames = {
+                            "ai-easy": "AI Bot (Easy)",
+                            "ai-normal": "AI Bot (Normal)",
+                            "ai-hard": "AI Bot (Hard)",
+                            "pvp": "Player 2"
+                        };
+                        inputP2.value = defaultNames[newMode] || "Player 2";
+                        this.p2CustomEdited = false;
+                    }
+                }
+
+                selectSize(cols, rows) {
+                    this.cols = cols;
+                    this.rows = rows;
+                    document.querySelectorAll("#size-grid .size-btn").forEach((btn) => {
+                        const c = parseInt(btn.getAttribute("data-cols"), 10);
+                        const r = parseInt(btn.getAttribute("data-rows"), 10);
+                        btn.classList.toggle("selected", c === cols && r === rows);
+                    });
+                }
+
+                setRulesVisible(visible) {
+                    document.getElementById("modal-rules").classList.toggle("hidden", !visible);
+                }
+
+                cancelPendingAi() {
+                    this.sessionToken++;
+                    if (this.aiTimeoutId !== null) {
+                        clearTimeout(this.aiTimeoutId);
+                        this.aiTimeoutId = null;
+                    }
+                    this.aiThinking = false;
+                }
+
+                showHome() {
+                    this.cancelPendingAi();
+                    document.getElementById("modal-gameover").classList.add("hidden");
+                    document.getElementById("screen-game").classList.add("hidden");
+                    document.getElementById("screen-home").classList.remove("hidden");
+                }
+
+                getInitials(name, fallback) {
+                    const cleaned = (name || "").replace(/[^a-zA-Z0-9 ]/g, "").trim();
+                    if (!cleaned) return fallback;
+                    const parts = cleaned.split(/\s+/);
+                    if (parts.length >= 2) {
+                        return (parts[0][0] + parts[1][0]).toUpperCase();
+                    }
+                    return cleaned.slice(0, 2).toUpperCase();
+                }
+
+                startNewMatch() {
+                    this.sfx.ensureContext();
+                    const p1Val = document.getElementById("input-p1").value.trim();
+                    const p2Val = document.getElementById("input-p2").value.trim();
+
+                    this.p1Name = p1Val || "Player 1";
+                    this.p2Name = p2Val || (this.mode === "pvp" ? "Player 2" : "AI Bot");
+
+                    document.getElementById("label-p1-name").textContent = this.p1Name;
+                    document.getElementById("label-p2-name").textContent = this.p2Name;
+                    document.getElementById("avatar-p1").textContent = this.getInitials(this.p1Name, "P1");
+                    document.getElementById("avatar-p2").textContent =
+                        this.mode === "pvp" ? this.getInitials(this.p2Name, "P2") : "AI";
+
+                    document.getElementById("screen-home").classList.add("hidden");
+                    document.getElementById("screen-game").classList.remove("hidden");
+
+                    this.resetBoard();
+                }
+
+                resetBoard() {
+                    this.cancelPendingAi();
+                    document.getElementById("modal-gameover").classList.add("hidden");
+
+                    const rows = this.rows;
+                    const cols = this.cols;
+
+                    // Explicit rectangular dimensions:
+                    // hLines: (rows + 1) rows, each with (cols) columns
+                    this.hLines = Array.from({ length: rows + 1 }, () => Array(cols).fill(0));
+                    // vLines: (rows) rows, each with (cols + 1) columns
+                    this.vLines = Array.from({ length: rows }, () => Array(cols + 1).fill(0));
+                    // boxes: (rows) rows, each with (cols) columns
+                    this.boxes = Array.from({ length: rows }, () => Array(cols).fill(0));
+
+                    this.scores = { 1: 0, 2: 0 };
+                    this.currentPlayer = 1;
+                    this.gameOver = false;
+                    this.aiThinking = false;
+                    this.lastMove = null;
+                    this.combo = 0;
+
+                    this.renderBoard();
+                    this.updateScoreboard(`${this.p1Name}'s Turn`);
+                }
+
+                /* =====================================================================
+                   SVG RENDERING (Adapts cleanly to 3x3, 4x4, 5x5, and 10x5 grids)
+                   ===================================================================== */
+                renderBoard() {
+                    const svg = document.getElementById("board-svg");
+                    while (svg.firstChild) {
+                        svg.removeChild(svg.firstChild);
+                    }
+
+                    const cols = this.cols;
+                    const rows = this.rows;
+                    const spacing = 64;
+                    const padding = 28;
+
+                    const viewWidth = padding * 2 + cols * spacing;
+                    const viewHeight = padding * 2 + rows * spacing;
+                    svg.setAttribute("viewBox", `0 0 ${viewWidth} ${viewHeight}`);
+
+                    const strokeWidth = cols >= 10 ? 6 : 8;
+                    const dotRadius = cols >= 10 ? 5.2 : 6.8;
+                    const hitWidth = 28;
+
+                    const p1Tag = this.getInitials(this.p1Name, "P1");
+                    const p2Tag = this.mode === "pvp" ? this.getInitials(this.p2Name, "P2") : "AI";
+
+                    const svgNS = "http://www.w3.org/2000/svg";
+
+                    // 1. Claimed Boxes Layer
+                    const boxLayer = document.createElementNS(svgNS, "g");
+                    for (let r = 0; r < rows; r++) {
+                        for (let c = 0; c < cols; c++) {
+                            const owner = this.boxes[r][c];
+                            if (owner === 0) continue;
+
+                            const x = padding + c * spacing;
+                            const y = padding + r * spacing;
+                            const inset = 6;
+
+                            const rect = document.createElementNS(svgNS, "rect");
+                            rect.setAttribute("x", String(x + inset));
+                            rect.setAttribute("y", String(y + inset));
+                            rect.setAttribute("width", String(spacing - inset * 2));
+                            rect.setAttribute("height", String(spacing - inset * 2));
+                            rect.setAttribute("rx", "9");
+                            rect.setAttribute("fill", owner === 1 ? "rgba(56, 189, 248, 0.22)" : "rgba(251, 113, 133, 0.22)");
+                            rect.setAttribute("class", "box-claimed");
+                            boxLayer.appendChild(rect);
+
+                            const text = document.createElementNS(svgNS, "text");
+                            text.setAttribute("x", String(x + spacing / 2));
+                            text.setAttribute("y", String(y + spacing / 2 + 6));
+                            text.setAttribute("text-anchor", "middle");
+                            text.setAttribute("font-size", "18");
+                            text.setAttribute("font-weight", "800");
+                            text.setAttribute("fill", owner === 1 ? "#38bdf8" : "#fb7185");
+                            text.setAttribute("pointer-events", "none");
+                            text.setAttribute("class", "box-claimed");
+                            text.textContent = owner === 1 ? p1Tag : p2Tag;
+                            boxLayer.appendChild(text);
+                        }
+                    }
+                    svg.appendChild(boxLayer);
+
+                    // 2. Edges Layer (Horizontal + Vertical)
+                    const edgeLayer = document.createElementNS(svgNS, "g");
+                    const canClick = !this.gameOver && !this.aiThinking && (this.mode === "pvp" || this.currentPlayer === 1);
+                    const turnClass = this.currentPlayer === 1 ? "p1-turn" : "p2-turn";
+
+                    // Horizontal edges: r in [0..rows], c in [0..cols-1]
+                    for (let r = 0; r <= rows; r++) {
+                        for (let c = 0; c < cols; c++) {
+                            const owner = this.hLines[r][c];
+                            const x1 = padding + c * spacing;
+                            const y1 = padding + r * spacing;
+                            const x2 = x1 + spacing;
+                            const y2 = y1;
+                            const isLast = this.lastMove && this.lastMove.type === "h" && this.lastMove.r === r && this.lastMove.c === c;
+
+                            edgeLayer.appendChild(
+                                this.buildEdgeNode(svgNS, "h", r, c, x1, y1, x2, y2, owner, strokeWidth, hitWidth, canClick, turnClass, isLast)
+                            );
+                        }
+                    }
+
+                    // Vertical edges: r in [0..rows-1], c in [0..cols]
+                    for (let r = 0; r < rows; r++) {
+                        for (let c = 0; c <= cols; c++) {
+                            const owner = this.vLines[r][c];
+                            const x1 = padding + c * spacing;
+                            const y1 = padding + r * spacing;
+                            const x2 = x1;
+                            const y2 = y1 + spacing;
+                            const isLast = this.lastMove && this.lastMove.type === "v" && this.lastMove.r === r && this.lastMove.c === c;
+
+                            edgeLayer.appendChild(
+                                this.buildEdgeNode(svgNS, "v", r, c, x1, y1, x2, y2, owner, strokeWidth, hitWidth, canClick, turnClass, isLast)
+                            );
+                        }
+                    }
+                    svg.appendChild(edgeLayer);
+
+                    // 3. Dots Layer: r in [0..rows], c in [0..cols]
+                    const dotLayer = document.createElementNS(svgNS, "g");
+                    for (let r = 0; r <= rows; r++) {
+                        for (let c = 0; c <= cols; c++) {
+                            const cx = padding + c * spacing;
+                            const cy = padding + r * spacing;
+
+                            const circle = document.createElementNS(svgNS, "circle");
+                            circle.setAttribute("cx", String(cx));
+                            circle.setAttribute("cy", String(cy));
+                            circle.setAttribute("r", String(dotRadius));
+                            circle.setAttribute("fill", "#f8fafc");
+                            circle.setAttribute("pointer-events", "none");
+                            dotLayer.appendChild(circle);
+                        }
+                    }
+                    svg.appendChild(dotLayer);
+                }
+
+                buildEdgeNode(svgNS, type, r, c, x1, y1, x2, y2, owner, strokeWidth, hitWidth, canClick, turnClass, isLast) {
+                    const g = document.createElementNS(svgNS, "g");
+                    const isUnclaimed = owner === 0;
+                    g.setAttribute("class", `edge-group ${isUnclaimed && canClick ? "interactive " + turnClass : ""}`);
+
+                    const visLine = document.createElementNS(svgNS, "line");
+                    visLine.setAttribute("x1", String(x1));
+                    visLine.setAttribute("y1", String(y1));
+                    visLine.setAttribute("x2", String(x2));
+                    visLine.setAttribute("y2", String(y2));
+
+                    if (isUnclaimed) {
+                        visLine.setAttribute("stroke", "rgba(148, 163, 184, 0.28)");
+                        visLine.setAttribute("stroke-width", String(Math.max(3, strokeWidth * 0.5)));
+                        visLine.setAttribute("stroke-dasharray", "4 6");
+                        visLine.setAttribute("class", "edge-visual unclaimed");
+                    } else {
+                        visLine.setAttribute("stroke", owner === 1 ? "#38bdf8" : "#fb7185");
+                        visLine.setAttribute("stroke-width", String(strokeWidth));
+                        visLine.setAttribute("class", "edge-visual");
+                    }
+                    g.appendChild(visLine);
+
+                    // Last-move white pip indicator
+                    if (isLast) {
+                        const pip = document.createElementNS(svgNS, "circle");
+                        pip.setAttribute("cx", String((x1 + x2) / 2));
+                        pip.setAttribute("cy", String((y1 + y2) / 2));
+                        pip.setAttribute("r", "2.6");
+                        pip.setAttribute("fill", "#ffffff");
+                        pip.setAttribute("pointer-events", "none");
+                        g.appendChild(pip);
+                    }
+
+                    // Generous invisible hit target for effortless mobile & desktop clicks
+                    if (isUnclaimed && canClick) {
+                        const hit = document.createElementNS(svgNS, "line");
+                        hit.setAttribute("x1", String(x1));
+                        hit.setAttribute("y1", String(y1));
+                        hit.setAttribute("x2", String(x2));
+                        hit.setAttribute("y2", String(y2));
+                        hit.setAttribute("stroke", "transparent");
+                        hit.setAttribute("stroke-width", String(hitWidth));
+                        hit.setAttribute("pointer-events", "all");
+                        hit.setAttribute("class", "edge-hitbox");
+                        hit.addEventListener("click", (e) => {
+                            e.stopPropagation();
+                            this.onHumanSelectEdge(type, r, c);
+                        });
+                        g.appendChild(hit);
+                    }
+
+                    return g;
+                }
+
+                /* =====================================================================
+                   TURN EXECUTION & BOX COMPLETION LOGIC
+                   ===================================================================== */
+                onHumanSelectEdge(type, r, c) {
+                    if (this.gameOver || this.aiThinking) return;
+                    if (this.mode !== "pvp" && this.currentPlayer !== 1) return;
+                    this.applyMove(type, r, c);
+                }
+
+                applyMove(type, r, c) {
+                    if (type === "h") {
+                        if (r < 0 || r > this.rows || c < 0 || c >= this.cols) return false;
+                        if (this.hLines[r][c] !== 0) return false;
+                        this.hLines[r][c] = this.currentPlayer;
+                    } else {
+                        if (r < 0 || r >= this.rows || c < 0 || c > this.cols) return false;
+                        if (this.vLines[r][c] !== 0) return false;
+                        this.vLines[r][c] = this.currentPlayer;
+                    }
+
+                    this.lastMove = { type, r, c };
+
+                    const newlyClaimed = this.claimCompletedBoxes(type, r, c, this.currentPlayer);
+                    if (newlyClaimed > 0) {
+                        this.scores[this.currentPlayer] += newlyClaimed;
+                        this.combo += newlyClaimed;
+                        this.sfx.playBox(this.combo);
+                    } else {
+                        this.combo = 0;
+                        this.sfx.playEdge(this.currentPlayer);
+                    }
+
+                    const totalBoxes = this.rows * this.cols;
+                    const claimedBoxes = this.scores[1] + this.scores[2];
+
+                    if (claimedBoxes >= totalBoxes) {
+                        this.gameOver = true;
+                        this.aiThinking = false;
+                        this.renderBoard();
+                        this.updateScoreboard("Match Complete!");
+                        setTimeout(() => this.showGameOverModal(), 400);
+                        return true;
+                    }
+
+                    const activeName = this.currentPlayer === 1 ? this.p1Name : this.p2Name;
+                    let statusMsg = "";
+
+                    if (newlyClaimed > 0) {
+                        // Bonus turn! Current player keeps turn
+                        statusMsg = `+${newlyClaimed} Box! ${activeName} gets a bonus turn`;
+                    } else {
+                        // Switch player
+                        this.currentPlayer = this.currentPlayer === 1 ? 2 : 1;
+                        const nextName = this.currentPlayer === 1 ? this.p1Name : this.p2Name;
+                        statusMsg = `${nextName}'s Turn`;
+                    }
+
+                    if (this.mode !== "pvp" && this.currentPlayer === 2 && !this.gameOver) {
+                        this.aiThinking = true;
+                        this.renderBoard();
+                        this.updateScoreboard(statusMsg);
+
+                        const token = ++this.sessionToken;
+                        const delay = totalBoxes >= 50 ? 240 : 380;
+                        this.aiTimeoutId = setTimeout(() => {
+                            if (token !== this.sessionToken || this.gameOver) return;
+                            this.runAiTurn();
+                        }, delay);
+                    } else {
+                        this.aiThinking = false;
+                        this.renderBoard();
+                        this.updateScoreboard(statusMsg);
+                    }
+
+                    return true;
+                }
+
+                claimCompletedBoxes(type, r, c, player) {
+                    let count = 0;
+
+                    const checkSingleBox = (br, bc) => {
+                        if (br < 0 || br >= this.rows || bc < 0 || bc >= this.cols) return false;
+                        if (this.boxes[br][bc] !== 0) return false;
+                        if (
+                            this.hLines[br][bc] !== 0 &&
+                            this.hLines[br + 1][bc] !== 0 &&
+                            this.vLines[br][bc] !== 0 &&
+                            this.vLines[br][bc + 1] !== 0
+                        ) {
+                            this.boxes[br][bc] = player;
+                            return true;
+                        }
+                        return false;
+                    };
+
+                    if (type === "h") {
+                        if (checkSingleBox(r - 1, c)) count++;
+                        if (checkSingleBox(r, c)) count++;
+                    } else {
+                        if (checkSingleBox(r, c - 1)) count++;
+                        if (checkSingleBox(r, c)) count++;
+                    }
+                    return count;
+                }
+
+                updateScoreboard(statusMessage) {
+                    document.getElementById("label-p1-score").textContent = String(this.scores[1]);
+                    document.getElementById("label-p2-score").textContent = String(this.scores[2]);
+
+                    const card1 = document.getElementById("card-p1");
+                    const card2 = document.getElementById("card-p2");
+                    const stat1 = document.getElementById("label-p1-status");
+                    const stat2 = document.getElementById("label-p2-status");
+
+                    if (this.currentPlayer === 1) {
+                        card1.classList.add("active-p1");
+                        card2.classList.remove("active-p2");
+                        stat1.textContent = this.gameOver ? "Finished" : "Your Turn";
+                        stat2.textContent = this.gameOver ? "Finished" : "Waiting";
+                    } else {
+                        card2.classList.add("active-p2");
+                        card1.classList.remove("active-p1");
+                        stat2.textContent = this.gameOver
+                            ? "Finished"
+                            : this.mode === "pvp"
+                            ? "Your Turn"
+                            : "Thinking...";
+                        stat1.textContent = this.gameOver ? "Finished" : "Waiting";
+                    }
+
+                    const totalBoxes = this.rows * this.cols;
+                    const remaining = totalBoxes - (this.scores[1] + this.scores[2]);
+                    document.getElementById("badge-board-info").textContent =
+                        `${this.cols}×${this.rows} • ${remaining} ${remaining === 1 ? "Box" : "Boxes"} Left`;
+
+                    const turnPill = document.getElementById("badge-turn-info");
+                    turnPill.textContent = statusMessage;
+                    turnPill.classList.toggle("p2", this.currentPlayer === 2);
+                }
+
+                /* =====================================================================
+                   AI OPPONENT (Easy, Normal, Hard - Rectangular & Square Safe)
+                   ===================================================================== */
+                getAllValidMoves() {
+                    const moves = [];
+                    for (let r = 0; r <= this.rows; r++) {
+                        for (let c = 0; c < this.cols; c++) {
+                            if (this.hLines[r][c] === 0) {
+                                moves.push({ type: "h", r, c });
+                            }
+                        }
+                    }
+                    for (let r = 0; r < this.rows; r++) {
+                        for (let c = 0; c <= this.cols; c++) {
+                            if (this.vLines[r][c] === 0) {
+                                moves.push({ type: "v", r, c });
+                            }
+                        }
+                    }
+                    return moves;
+                }
+
+                countSides(br, bc, hArr, vArr) {
+                    const h = hArr || this.hLines;
+                    const v = vArr || this.vLines;
+                    let count = 0;
+                    if (h[br][bc] !== 0) count++;
+                    if (h[br + 1][bc] !== 0) count++;
+                    if (v[br][bc] !== 0) count++;
+                    if (v[br][bc + 1] !== 0) count++;
+                    return count;
+                }
+
+                getAdjacentBoxCoords(move) {
+                    const list = [];
+                    if (move.type === "h") {
+                        if (move.r - 1 >= 0) list.push({ r: move.r - 1, c: move.c });
+                        if (move.r < this.rows) list.push({ r: move.r, c: move.c });
+                    } else {
+                        if (move.c - 1 >= 0) list.push({ r: move.r, c: move.c - 1 });
+                        if (move.c < this.cols) list.push({ r: move.r, c: move.c });
+                    }
+                    return list;
+                }
+
+                runAiTurn() {
+                    if (this.gameOver) return;
+                    const validMoves = this.getAllValidMoves();
+                    if (validMoves.length === 0) return;
+
+                    let chosen = null;
+                    if (this.mode === "ai-easy") {
+                        chosen = this.pickEasyMove(validMoves);
+                    } else if (this.mode === "ai-normal") {
+                        chosen = this.pickNormalMove(validMoves);
+                    } else {
+                        chosen = this.pickHardMove(validMoves);
+                    }
+
+                    this.aiThinking = false;
+                    this.applyMove(chosen.type, chosen.r, chosen.c);
+                }
+
+                // Easy: Takes available 3-sided boxes ~60% of the time, otherwise random valid move
+                pickEasyMove(moves) {
+                    const scoring = moves.filter((m) =>
+                        this.getAdjacentBoxCoords(m).some((b) => this.countSides(b.r, b.c) === 3)
+                    );
+                    if (scoring.length > 0 && Math.random() < 0.6) {
+                        return scoring[Math.floor(Math.random() * scoring.length)];
+                    }
+                    return moves[Math.floor(Math.random() * moves.length)];
+                }
+
+                // Normal: Always completes 3-sided boxes; otherwise prefers safe moves; fallback random
+                pickNormalMove(moves) {
+                    const scoring = [];
+                    const safe = [];
+                    const unsafe = [];
+
+                    for (const m of moves) {
+                        const adj = this.getAdjacentBoxCoords(m);
+                        const completes = adj.some((b) => this.countSides(b.r, b.c) === 3);
+                        const opensThird = adj.some((b) => this.countSides(b.r, b.c) === 2);
+
+                        if (completes) scoring.push(m);
+                        else if (!opensThird) safe.push(m);
+                        else unsafe.push(m);
+                    }
+
+                    if (scoring.length > 0) {
+                        return scoring[Math.floor(Math.random() * scoring.length)];
+                    }
+                    if (safe.length > 0) {
+                        return safe[Math.floor(Math.random() * safe.length)];
+                    }
+                    return unsafe[Math.floor(Math.random() * unsafe.length)];
+                }
+
+                // Hard: Double-dealing end-of-chain control + shortest-chain sacrifice
+                pickHardMove(moves) {
+                    const scoring = [];
+                    const safe = [];
+                    const unsafe = [];
+
+                    for (const m of moves) {
+                        const adj = this.getAdjacentBoxCoords(m);
+                        const completes = adj.some((b) => this.countSides(b.r, b.c) === 3);
+                        const opensThird = adj.some((b) => this.countSides(b.r, b.c) === 2);
+
+                        if (completes) scoring.push(m);
+                        else if (!opensThird) safe.push(m);
+                        else unsafe.push(m);
+                    }
+
+                    if (scoring.length > 0) {
+                        // Check if safe moves are exhausted and we are near the end of a chain of length >= 2
+                        if (safe.length === 0 && scoring.length === 1 && unsafe.length > 0) {
+                            const remainingInChain = this.simulateChainLength(scoring[0]);
+                            if (remainingInChain === 2) {
+                                // Look for a double-cross sacrifice edge that leaves the last 2 boxes for opponent
+                                const doubleDealMove = unsafe.find((um) => this.simulateChainLength(um) === 2);
+                                if (doubleDealMove) {
+                                    // Verify another larger chain exists to make double-dealing worthwhile
+                                    const otherChainsExist = unsafe.some(
+                                        (um) => um !== doubleDealMove && this.simulateChainLength(um) >= 3
+                                    );
+                                    if (otherChainsExist) {
+                                        return doubleDealMove;
+                                    }
+                                }
+                            }
+                        }
+
+                        // Prefer moves that complete 2 boxes at once
+                        scoring.sort((a, b) => {
+                            const aBoxes = this.getAdjacentBoxCoords(a).filter((box) => this.countSides(box.r, box.c) === 3).length;
+                            const bBoxes = this.getAdjacentBoxCoords(b).filter((box) => this.countSides(box.r, box.c) === 3).length;
+                            return bBoxes - aBoxes;
+                        });
+                        return scoring[0];
+                    }
+
+                    if (safe.length > 0) {
+                        // Shuffle first for natural variety, then prefer edges touching boxes with fewer existing sides
+                        for (let i = safe.length - 1; i > 0; i--) {
+                            const j = Math.floor(Math.random() * (i + 1));
+                            [safe[i], safe[j]] = [safe[j], safe[i]];
+                        }
+                        safe.sort((a, b) => {
+                            const aMax = Math.max(...this.getAdjacentBoxCoords(a).map((box) => this.countSides(box.r, box.c)));
+                            const bMax = Math.max(...this.getAdjacentBoxCoords(b).map((box) => this.countSides(box.r, box.c)));
+                            return aMax - bMax;
+                        });
+                        return safe[0];
+                    }
+
+                    // Forced to open a box: simulate chain lengths across rows x cols and sacrifice shortest chain
+                    let bestMove = unsafe[0];
+                    let shortestChain = Infinity;
+
+                    for (const m of unsafe) {
+                        const chainLen = this.simulateChainLength(m);
+                        if (chainLen < shortestChain) {
+                            shortestChain = chainLen;
+                            bestMove = m;
+                        }
+                    }
+
+                    return bestMove;
+                }
+
+                simulateChainLength(move) {
+                    const hCopy = this.hLines.map((row) => row.slice());
+                    const vCopy = this.vLines.map((row) => row.slice());
+
+                    if (move.type === "h") hCopy[move.r][move.c] = 2;
+                    else vCopy[move.r][move.c] = 2;
+
+                    let captured = 0;
+                    let progress = true;
+
+                    while (progress) {
+                        progress = false;
+                        for (let r = 0; r < this.rows; r++) {
+                            for (let c = 0; c < this.cols; c++) {
+                                if (this.countSides(r, c, hCopy, vCopy) === 3) {
+                                    if (hCopy[r][c] === 0) hCopy[r][c] = 1;
+                                    else if (hCopy[r + 1][c] === 0) hCopy[r + 1][c] = 1;
+                                    else if (vCopy[r][c] === 0) vCopy[r][c] = 1;
+                                    else if (vCopy[r][c + 1] === 0) vCopy[r][c + 1] = 1;
+                                    captured++;
+                                    progress = true;
+                                }
+                            }
+                        }
+                    }
+
+                    return captured;
+                }
+
+                /* =====================================================================
+                   GAME OVER SUMMARY
+                   ===================================================================== */
+                showGameOverModal() {
+                    const modal = document.getElementById("modal-gameover");
+                    const emoji = document.getElementById("gameover-emoji");
+                    const title = document.getElementById("gameover-title");
+                    const subtitle = document.getElementById("gameover-subtitle");
+
+                    document.getElementById("final-p1-name").textContent = this.p1Name;
+                    document.getElementById("final-p2-name").textContent = this.p2Name;
+                    document.getElementById("final-p1-score").textContent = String(this.scores[1]);
+                    document.getElementById("final-p2-score").textContent = String(this.scores[2]);
+
+                    const totalBoxes = this.rows * this.cols;
+
+                    if (this.scores[1] > this.scores[2]) {
+                        emoji.textContent = "🏆";
+                        title.textContent = `${this.p1Name} Wins!`;
+                        subtitle.textContent = `Captured ${this.scores[1]} of ${totalBoxes} boxes.`;
+                        this.sfx.playWin();
+                    } else if (this.scores[2] > this.scores[1]) {
+                        if (this.mode === "pvp") {
+                            emoji.textContent = "🏆";
+                            title.textContent = `${this.p2Name} Wins!`;
+                            subtitle.textContent = `Captured ${this.scores[2]} of ${totalBoxes} boxes.`;
+                            this.sfx.playWin();
+                        } else {
+                            emoji.textContent = "🤖";
+                            title.textContent = `${this.p2Name} Wins!`;
+                            subtitle.textContent = `Claimed ${this.scores[2]} of ${totalBoxes} boxes. Try a rematch!`;
+                            this.sfx.playLose();
+                        }
+                    } else {
+                        emoji.textContent = "🤝";
+                        title.textContent = "It's a Tie!";
+                        subtitle.textContent = `Both players finished with ${this.scores[1]} boxes.`;
+                        this.sfx.playWin();
+                    }
+
+                    modal.classList.remove("hidden");
+                }
+            }
+
+            window.addEventListener("DOMContentLoaded", () => {
+                window.dotsAndBoxes = new DotsAndBoxesGame();
+            });
+        })();
+    </script>
+</body>
+</html>
